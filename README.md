@@ -1,77 +1,110 @@
-# React + TypeScript + Vite
+# Crypto Screener
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack cryptocurrency screener built with **FastAPI, React, TypeScript, and the CoinGecko API**.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Backend:** Python, FastAPI, HTTPX, Pydantic
+- **Frontend:** React, TypeScript, Vite
+- **API:** CoinGecko
 
-## React Compiler
+## What I Completed
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+### Backend
 
-Note: This will impact Vite dev & build performances.
+The backend provides:
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```text
+GET /api/crypto
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+It retrieves cryptocurrency data from CoinGecko and filters projects by:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- Market Cap > $0
+- FDV < $100M
+- 24h Trading Volume > $50K
+- Max Supply = Total Supply
+- TVL > $50K
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+The API also supports sorting by:
 
+- Market Capitalization
+- 24h Trading Volume
+
+with ascending or descending order.
+
+A health check endpoint is also available:
+
+```text
+GET /api/health
 ```
+
+### Frontend
+
+The frontend:
+
+- Displays cryptocurrency projects in a table
+- Supports search by project name
+- Supports partial matches, e.g. `eth`
+- Supports a custom maximum FDV filter
+- Supports sorting by Market Cap
+- Supports sorting by 24h Trading Volume
+- Supports ascending and descending order
+- Shows loading and error states
+- Communicates only with the backend
+
+## How to Run
+
+### 1. Backend
+
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Create a `.env` file:
+
+```env
+COINGECKO_API_KEY=your_api_key
+COINGECKO_BASE_URL=https://api.coingecko.com/api/v3
+CACHE_TTL_SECONDS=300
+MAX_DETAIL_CONCURRENCY=8
+```
+
+Run the backend:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+The backend will be available at:
+
+```text
+http://localhost:8000
+```
+
+### 2. Frontend
+
+Open another terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The frontend will be available at:
+
+```text
+http://localhost:5173
+```
+
+## Assumptions and Limitations
+
+**Preview listing:** CoinGecko returned `preview_listing: false` for the available projects. Applying this condition strictly resulted in an empty dataset. Therefore, the value is retrieved and returned by the backend but is not used as a blocking filter.
+
+**Caching:** Results are cached for 5 minutes to reduce unnecessary CoinGecko API requests and avoid rate limits.
+
+**API limits:** The application depends on CoinGecko API availability and rate limits.
