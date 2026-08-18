@@ -12,13 +12,7 @@ A full-stack cryptocurrency screener built with **FastAPI, React, TypeScript, an
 
 ### Backend
 
-The backend provides:
-
-```text
-GET /api/crypto
-```
-
-It retrieves cryptocurrency data from CoinGecko and filters projects by:
+The backend retrieves cryptocurrency data from CoinGecko and filters projects by:
 
 - Market Cap > $0
 - FDV < $100M
@@ -49,7 +43,7 @@ The frontend:
 - Supports a custom maximum FDV filter
 - Supports sorting by Market Cap
 - Supports sorting by 24h Trading Volume
-- Supports ascending and descending order
+- Supports ascending and descending order (Lowest/Highest first)
 - Shows loading and error states
 - Communicates only with the backend
 
@@ -57,16 +51,13 @@ The frontend:
 
 ### 1. Backend
 
-```bash
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+```
+cd backend/apps
 ```
 
 Create a `.env` file:
 
-```env
+```
 COINGECKO_API_KEY=your_api_key
 COINGECKO_BASE_URL=https://api.coingecko.com/api/v3
 CACHE_TTL_SECONDS=300
@@ -75,13 +66,13 @@ MAX_DETAIL_CONCURRENCY=8
 
 Run the backend:
 
-```bash
+```
 uvicorn app.main:app --reload
 ```
 
 The backend will be available at:
 
-```text
+```
 http://localhost:8000
 ```
 
@@ -89,15 +80,14 @@ http://localhost:8000
 
 Open another terminal:
 
-```bash
-cd frontend
+```
 npm install
 npm run dev
 ```
 
 The frontend will be available at:
 
-```text
+```
 http://localhost:5173
 ```
 
