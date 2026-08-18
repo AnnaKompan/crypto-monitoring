@@ -3,8 +3,8 @@ from enum import Enum
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.coingecko import coingecko
-from app.schemas import CryptoListResponse
+from coingecko import coingecko
+from schemas import CryptoListResponse
 
 
 class SortBy(str, Enum):

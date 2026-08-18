@@ -4,8 +4,8 @@ from typing import Any
 
 import httpx
 
-from app.config import settings
-from app.schemas import CryptoProject
+from config import settings
+from schemas import CryptoProject
 
 
 class CoinGeckoClient:
@@ -39,7 +39,6 @@ class CoinGeckoClient:
                 headers=self._headers(),
             )
 
-            # CoinGecko rate limit
             if response.status_code == 429:
                 if attempt == 2:
                     response.raise_for_status()
@@ -135,7 +134,6 @@ class CoinGeckoClient:
                 )
 
             except httpx.HTTPError:
-                # One failed coin should not break the whole request.
                 return None
 
             preview_listing = details.get("preview_listing") is True
@@ -171,7 +169,6 @@ class CoinGeckoClient:
         self,
     ) -> list[CryptoProject]:
 
-        # Return cached data if it is still fresh.
         if self._cache:
             cached_at, cached_projects = self._cache
 
@@ -182,18 +179,15 @@ class CoinGeckoClient:
             timeout=20.0
         ) as client:
 
-            # Get market data first.
             markets = await self._get_market_pages(client)
 
-            # Apply filters that are available from /coins/markets.
             candidates = [
                 coin
                 for coin in markets
                 if self._passes_market_filters(coin)
             ]
-            candidates = candidates[:20]
+            # candidates = candidates[:20]
 
-            # Limit concurrent detail requests.
             semaphore = asyncio.Semaphore(
                 settings.max_detail_concurrency
             )
